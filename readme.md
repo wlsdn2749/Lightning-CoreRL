@@ -1,5 +1,5 @@
 # Lightning Core RL
-This repository is created for personal study and research purposes, containing code and examples of various reinforcement learning algorithms. Here, we will implement and experiment with different reinforcement learning algorithms using the [Pytorch Lightning](https://github.com/PyTorchLightning/pytorch-lightning) framework. framework.
+This repository is created for personal study and research purposes, containing code and examples of various reinforcement learning algorithms. Here, we will implement and experiment with different reinforcement learning algorithms using the [Pytorch Lightning](https://github.com/PyTorchLightning/pytorch-lightning) framework.
 
 
 ## Algorithms
@@ -47,6 +47,6 @@ python ...
 While this repository was initiated for personal study and research, contributions and suggestions are always welcome. Whether it's bug reports, code improvements, or the implementation of new algorithms, any form of contribution is appreciated.
 
 ## License
-The code in this repository is distributed under the [MIT License](...). Therefore, you are free to use it for both commercial and non-commercial purposes.
+The code in this repository is distributed under the [MIT License](https://github.com/wlsdn2749/Lightning-CoreRL/blob/master/LICENSE). Therefore, you are free to use it for both commercial and non-commercial purposes.
 
 Feel free to utilize this repository to enhance your understanding of reinforcement learning, develop your own reinforcement learning algorithms, and conduct experiments in the field.
