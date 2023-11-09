@@ -5,7 +5,8 @@ This repository is created for personal study and research purposes, containing 
 ## Algorithms
 
 ### Off Policy
-- [ ] Q-learning
+- [x] Q-learning
+- [x] SARSA 
 - [ ] DQN
 - [ ] Double DQN
 - [ ] Dueling DQN
