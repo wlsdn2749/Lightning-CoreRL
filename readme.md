@@ -4,7 +4,9 @@ This repository is created for personal study and research purposes, containing 
 
 ## Algorithms
 
-### Off Policy
+### Model-free
+
+#### Off Policy
 - [x] Q-learning
 - [x] SARSA 
 - [ ] DQN
@@ -17,12 +19,16 @@ This repository is created for personal study and research purposes, containing 
 - [ ] TD3
 - [ ] SAC
 
-### On Policy
+#### On Policy
 - [ ] REINFORCE/Vanilla Policy Gradient
 - [ ] A3C
 - [ ] A2C
 - [ ] PPO
 - [ ] GAIL
+
+### Model-based
+
+- [ ] Dyna / Dyna Q+
 
 
 ## Objectives
