@@ -79,9 +79,13 @@ def dyna_q(args):
     epsilon_decay = args.eps_decay
     num_eval_epochs = 50
     episode_length = args.episode_length
+    plus = args.plus
     
     Q = {}
     model = {}
+    if plus:
+        tau = np.zeros((len(env.accessible_states), 4))
+        kappa = 1e-3
 
     # env.accessible_states.pop(8) #  ??? ternimal state는 더이상 할 수 있는 action이 없음
 
@@ -91,6 +95,7 @@ def dyna_q(args):
         for a in range(4):
             Q[s] += [np.random.random()] # maybe change into np.zeros?
             model[s] += [np.random.random()]
+    
             
 
     # train 할때마다 reset 해주어야함
@@ -109,6 +114,8 @@ def dyna_q(args):
         # episode_num = 0
         # running_average = []
         start = time.time()
+        if plus:
+            tau += 1
         while not done:
             # S <- current (nonterminal) state
             state = env.player_pos
@@ -140,7 +147,11 @@ def dyna_q(args):
             
             # --- Q-planning start ---
             # Model(S, A) <- R, S'
-            model[state][action] = (reward, next_state)   
+            model[state][action] = (reward, next_state)  
+            
+            # dyna-Q+ Initialize tau for (s, a)
+            if plus:
+                tau[state][action] = 0 
                 
             if done:
                 state = env.reset()
@@ -165,10 +176,19 @@ def dyna_q(args):
                 # R, S' <- Model(S,A)
                 r1, next_s1 = model[s1][a1]
                 
-                # Q Update
-                td_target = r1 + gamma * np.max(Q[next_s1])
-                td_error = td_target - Q[s1][a1]
-                Q[s1][a1] = Q[s1][a1] + alpha * td_error
+                if plus:
+                    # Q Update
+                    bonus = kappa * np.sqrt(tau[s1][a1])
+                    td_target = r1 + bonus + gamma * np.max(Q[next_s1])
+                    td_error = td_target - Q[s1][a1]
+                    Q[s1][a1] = Q[s1][a1] + alpha * td_error
+                else:
+                    # Q Update
+                    td_target = r1 + gamma * np.max(Q[next_s1])
+                    td_error = td_target - Q[s1][a1]
+                    Q[s1][a1] = Q[s1][a1] + alpha * td_error
+                
+                
                 
         epsilon = max(epsilon - epsilon_decay, 0.1) # epsilon decay
         
@@ -198,7 +218,7 @@ if __name__ == "__main__":
 
     parent_parser.add_argument("--eps", type=float, default=1.0, help="epsilon")
     parent_parser.add_argument("--eps_decay", type=float, default=1e-3, help="epslion decay")
-    
+    parent_parser.add_argument("--plus", action='store_true')
     
     args = parent_parser.parse_args()
     args.episode_length = 10
