@@ -1,0 +1,39 @@
+8 1 True
+Attained total reward at 1th episode: -0.51, total_step : 152
+total time is  {0.17550063133239746}
+8 1 True
+Attained total reward at 2th episode: -4.34, total_step : 535
+total time is  {1.0104563236236572}
+8 1 True
+Attained total reward at 3th episode: 0.16, total_step : 85
+total time is  {0.21131324768066406}
+8 1 True
+Attained total reward at 4th episode: -3.67, total_step : 468
+total time is  {1.4739875793457031}
+8 1 True
+Attained total reward at 5th episode: -4.68, total_step : 569
+total time is  {2.4572384357452393}
+8 1 True
+Attained total reward at 6th episode: -1.10, total_step : 211
+total time is  {1.0917201042175293}
+8 1 True
+Attained total reward at 7th episode: -3.19, total_step : 420
+total time is  {2.4739267826080322}
+8 1 True
+Attained total reward at 8th episode: -0.56, total_step : 157
+total time is  {1.019634485244751}
+8 1 True
+Attained total reward at 9th episode: -2.02, total_step : 303
+total time is  {2.139686346054077}
+8 1 True
+Attained total reward at 10th episode: -1.45, total_step : 246
+total time is  {1.8782105445861816}
+[-0.5100000000000011, -4.339999999999931, 0.15999999999999948, -3.669999999999945, -4.679999999999923, -1.0999999999999992, -3.189999999999955, -0.5600000000000012, -2.0199999999999796, -1.4499999999999917]
+----------------BEST POLICY----------------
+['>', '>', '>', '>', '>', '>', '>', '>', 'G']
+['^', '>', '>', '>', '>', '^', '^', '>', '^']
+['>', '>', '>', '>', '>', '>', '>', '>', '^']
+['^', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X']
+['^', '<', '<', '<', '<', '<', '<', '<', '<']
+['^', '<', '^', '<', 'S', '<', '<', '<', '<']
+-------------------------------------------

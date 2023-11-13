@@ -10,6 +10,7 @@ readme = "README.md"
 python = "^3.9"
 pytorch-lightning = "^2.1.1"
 gymnasium = {extras = ["toy-text"], version = "^0.29.1"}
+wandb = "^0.16.0"
 
 
 [build-system]

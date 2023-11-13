@@ -1,0 +1,44 @@
+8 1 True
+Attained total reward at 1th episode: -2.37, total_step : 338
+total time is  {2.1825919151306152}
+8 1 True
+Attained total reward at 2th episode: -1.57, total_step : 258
+total time is  {2.5514731407165527}
+8 1 True
+Attained total reward at 3th episode: -1.45, total_step : 246
+total time is  {3.058194875717163}
+8 1 True
+Attained total reward at 4th episode: -2.79, total_step : 380
+total time is  {6.021714925765991}
+8 1 True
+Attained total reward at 5th episode: -2.09, total_step : 310
+total time is  {6.186386346817017}
+8 1 True
+Attained total reward at 6th episode: -0.53, total_step : 154
+total time is  {3.4734952449798584}
+8 1 True
+Attained total reward at 7th episode: -1.06, total_step : 207
+total time is  {5.070195436477661}
+8 1 True
+Attained total reward at 8th episode: -6.54, total_step : 755
+total time is  {21.892069578170776}
+8 1 True
+Attained total reward at 9th episode: -7.01, total_step : 802
+total time is  {31.330978393554688}
+8 1 True
+Attained total reward at 10th episode: -2.54, total_step : 355
+total time is  {15.946780920028687}
+8 1 True
+Attained total reward at 11th episode: -1.81, total_step : 282
+total time is  {13.527596473693848}
+Traceback (most recent call last):
+  File "/workspace/2023_Fall_GL_RL/RL/Lightning-Core-RL/algorithms/dyna-q.py", line 209, in <module>
+    average_rewards = dyna_q(args) # reward
+  File "/workspace/2023_Fall_GL_RL/RL/Lightning-Core-RL/algorithms/dyna-q.py", line 162, in dyna_q
+    s1 = np.random.choice(state_memory)
+  File "mtrand.pyx", line 997, in numpy.random.mtrand.RandomState.choice
+  File "mtrand.pyx", line 781, in numpy.random.mtrand.RandomState.randint
+  File "_bounded_integers.pyx", line 1315, in numpy.random._bounded_integers._rand_int64
+  File "/workspace/2023_Fall_GL_RL/RL/Lightning-Core-RL/.venv/lib/python3.9/site-packages/numpy/core/fromnumeric.py", line 2974, in _prod_dispatcher
+    def _prod_dispatcher(a, axis=None, dtype=None, out=None, keepdims=None,
+KeyboardInterrupt

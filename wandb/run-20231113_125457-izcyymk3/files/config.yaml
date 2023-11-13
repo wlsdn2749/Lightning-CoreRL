@@ -1,0 +1,41 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    python_version: 3.9.7
+    cli_version: 0.16.0
+    is_jupyter_run: false
+    is_kaggle_kernel: true
+    start_time: 1699847697.299108
+    t:
+      1:
+      - 55
+      2:
+      - 55
+      3:
+      - 23
+      4: 3.9.7
+      5: 0.16.0
+      8:
+      - 2
+      - 5
+      13: linux-x86_64
+lr:
+  desc: null
+  value: 0.0001
+alpha:
+  desc: null
+  value: 0.5
+gamma:
+  desc: null
+  value: 0.9
+episode_length:
+  desc: null
+  value: 10
+eps:
+  desc: null
+  value: 1.0
+eps_decay:
+  desc: null
+  value: 0.001

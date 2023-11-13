@@ -148,7 +148,7 @@ class Dyna_env:
 class State:
     def __init__(self, id):
         self.id = id 
-        self.reward = 0  
+        self.reward = -0.01  
         self.accessible = True
 
 
