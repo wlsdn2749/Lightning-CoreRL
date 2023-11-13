@@ -28,7 +28,7 @@ This repository is created for personal study and research purposes, containing 
 
 ### Model-based
 
-- [ ] Dyna / Dyna Q+
+- [x] Dyna / Dyna Q+
 
 
 ## Objectives
