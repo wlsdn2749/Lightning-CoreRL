@@ -36,8 +36,9 @@ def run_environment(env, Q=None, n_iterations=10, render=True):
                 action = np.argmax(Q[state, :])
 
             # take the next step
-            next_state, reward,  done, trancated, info = env.step(action)
+            next_state, reward, terminated, truncated, info = env.step(action)
             
+            done = terminated or truncated
             # change the state
             state = next_state
 

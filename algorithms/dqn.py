@@ -3,7 +3,7 @@ import argparse
 import wandb
 import random
 import numpy as np
-
+import gymnasium as gym
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -14,25 +14,31 @@ from typing import Tuple, List, Dict
 from collections import OrderedDict
 from common import cli
 from common import wrappers
-from common.networks import CNN
+from common.networks import CNN, MLP
 
 from common.agents import ValueAgent
 from common.experience import ExperienceSource, RLDataset
 from common.memory import ReplayBuffer
+from common.wrappers import ToTensor
 
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
+
 
 class DQNLightning(pl.LightningModule):
     """ Basic DQN model"""
     def __init__(self, hparams: argparse.Namespace) -> None:
         super().__init__()
-        self._hparams = hparams
+        self.save_hyperparameters(hparams)
+        # self.hparams.update(hparams)
+        # self.hparams = hparams 
         
-        device = torch.device("cuda:0" if self._hparams.gpus > 0 else "cpu")
         
-        self.env = wrappers.make_env(self._hparams.env) # common
-        self.env.seed(123)
+        device = torch.device("cuda:0" if self.hparams.devices > 0 else "cpu")
+        
+        # self.env = wrappers.make_env(self.hparams.env)    # use for Atari
+        self.env = ToTensor(gym.make(self.hparams.env))     # use for Box2D/Control
+        self.env.reset()
         
         self.obs_shape = self.env.observation_space.shape
         self.n_actions = self.env.action_space.n
@@ -45,9 +51,9 @@ class DQNLightning(pl.LightningModule):
         self.agent = ValueAgent(
             self.net,
             self.n_actions,
-            eps_start = hparams.eps_start,
-            eps_end = hparams.eps_end,
-            eps_frames = hparams.eps_last_frame
+            eps_start = self.hparams.eps_start,
+            eps_end = self.hparams.eps_end,
+            eps_frames = self.hparams.eps_last_frame
         )
         
         self.source = ExperienceSource(self.env, self.agent, device)
@@ -58,6 +64,7 @@ class DQNLightning(pl.LightningModule):
         self.episode_steps = 0
         self.total_episode_steps = 0
         self.reward_list = []
+        
         for _ in range(100):
             self.reward_list.append(-21) # ? why -21..
         self.avg_reward = -21
@@ -73,8 +80,8 @@ class DQNLightning(pl.LightningModule):
         
     def build_networks(self) -> None:
         """Initializes the DQN train and target networks"""
-        self.net = CNN(self.obs_shape, self.n_actions)
-        self.target_net = CNN(self.obs_shape, self.n_actions)
+        self.net = MLP(self.obs_shape, self.n_actions)
+        self.target_net = MLP(self.obs_shape, self.n_actions)
         
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -86,7 +93,7 @@ class DQNLightning(pl.LightningModule):
             x: environment state
             
         Returns:
-            q values
+            q values     
         """
         output = self.net(x)
         return output
@@ -110,11 +117,11 @@ class DQNLightning(pl.LightningModule):
             next_state_values[dones] = 0.0
             next_state_values = next_state_values.detach()
             
-        expected_state_action_values = next_state_values * self._hparams.gamma + rewards
+        expected_state_action_values = next_state_values * self.hparams.gamma + rewards
         
         return nn.MSELoss()(state_action_values, expected_state_action_values)
         
-    def training_step(self, batch: Tuple[torch.Tensor, torch.Tensor], _) -> OrderedDict:
+    def training_step(self, batch: Tuple[torch.Tensor, torch.Tensor], _):
         """
         
         Carries out a single step through the environemnt to update the replay buffer.
@@ -125,7 +132,7 @@ class DQNLightning(pl.LightningModule):
             _: batch number, not used
             
         Returns:
-            Training loss and log metrics
+            Training loss
         
         """
         self.agent.update_epsilon(self.global_step)
@@ -138,10 +145,8 @@ class DQNLightning(pl.LightningModule):
         self.episode_steps += 1
         
         # calculates training loss
-        loss = self.loss(batch)
-        
-        if self.trainer.use_dp or self.trainer_use_ddp2:
-            loss = loss.unsqueeze(0) # 병렬처리
+        loss = self.loss(batch)            
+        # loss = loss.unsqueeze(0) # 병렬처리
             
         if done:
             self.total_reward = self.episode_reward
@@ -153,8 +158,8 @@ class DQNLightning(pl.LightningModule):
             self.episode_steps = 0
             
         # Soft update of target network
-        if self.global_step % self._hparams.sync_rate == 0:
-            self.target_net.load_state_dict(self.next.state_dict())
+        if self.global_step % self.hparams.sync_rate == 0:
+            self.target_net.load_state_dict(self.net.state_dict())
             
         log = {'total_reward' : torch.tensor(self.total_reward).to(self.device),
                'avg_reward': torch.tensor(self.avg_reward),
@@ -170,10 +175,15 @@ class DQNLightning(pl.LightningModule):
                   'epsilon': self.agent.epsilon
                   }
         
-        return OrderedDict({'loss': loss,
-                            'avg_reward': torch.tensor(self.avg_reward),
-                            'log': log,
-                            'progress_bar': status})
+        # self.log_dict(log, prog_bar=True)
+        self.log_dict(status, prog_bar=True)
+        
+        # return OrderedDict({'loss': loss,
+        #                     'avg_reward': torch.tensor(self.avg_reward),
+        #                     'log': log,
+        #                     'progress_bar': status})
+        
+        return loss
 
         
     def test_step(self, *args, **kwargs) -> Dict[str, torch.Tensor]:
@@ -192,17 +202,17 @@ class DQNLightning(pl.LightningModule):
     
     def configure_optimizers(self) -> List[Optimizer]:
         """ Initialize Adam optimizer"""
-        optimizer = optim.Adam(self.net.parameters(), lr=self._hparams.lr)
+        optimizer = optim.Adam(self.net.parameters(), lr=self.hparams.lr)
         return [optimizer]
     
     def _dataloader(self) -> DataLoader:
         """Initialize the Replay buffer dataset used for retrieving experiences"""
-        self.buffer = ReplayBuffer(self._hparams.replay_size)
-        self.populate(self._hparams.warm_start_size)
+        self.buffer = ReplayBuffer(self.hparams.replay_size)
+        self.populate(self.hparams.warm_start_size)
         
-        dataset = RLDataset(self.buffer, self._hparams.episode_length)
+        dataset = RLDataset(self.buffer, self.hparams.episode_length)
         dataloader = DataLoader(dataset=dataset,
-                                batch_size=self._hparams.batch_size,
+                                batch_size=self.hparams.batch_size,
                                 )
         return dataloader
     
@@ -265,7 +275,7 @@ if __name__ == "__main__":
     np.random.seed(args.seed)
     random.seed(args.seed)
     
-    model = DQNLightning(args)
+    model = DQNLightning(args) # Namespace as a dict
     
     checkpoint_callback = ModelCheckpoint(
         save_top_k=1,
@@ -274,13 +284,12 @@ if __name__ == "__main__":
     )
     
     trainer = pl.Trainer(
-        gpus=args.gpus, # how many gpu you use?
-        distribued_backend=args.backend,
+        devices=args.devices, # how many gpu you use?
+        strategy=args.strategy,
         max_steps=args.max_steps,
         max_epochs=args.max_steps,
         val_check_interval=1000,
-        profiler=True,
-        checkpoint_callback=checkpoint_callback,
+        callbacks=checkpoint_callback,
         logger=wandb_logger        
     )
     

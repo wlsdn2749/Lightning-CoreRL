@@ -52,7 +52,7 @@ class Buffer:
         return (np.array(states), 
                 np.array(actions), 
                 np.array(rewards, dtype=np.float32),
-                np.array(dones, dtype=np.bool),
+                np.array(dones, dtype=np.bool_),
                 np.array(next_states))
         
 class ReplayBuffer(Buffer):
@@ -82,7 +82,7 @@ class ReplayBuffer(Buffer):
         return (np.array(states), 
                 np.array(actions), 
                 np.array(rewards, dtype=np.float32),
-                np.array(dones, dtype=np.bool),
+                np.array(dones, dtype=np.bool_),
                 np.array(next_states))
         
     

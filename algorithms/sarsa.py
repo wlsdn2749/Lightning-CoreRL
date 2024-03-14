@@ -3,6 +3,7 @@ import gymnasium as gym
 import pickle
 from common.env import run_environment
 from common.utils import save_obj, load_obj
+import time
 
 def sarsa(env, alpha=0.8, gamma=0.98, epsilon=1.0, epsilon_decay=0.001, num_episodes=1000, save_path="q_tables", render=False):
     """
@@ -31,7 +32,7 @@ def sarsa(env, alpha=0.8, gamma=0.98, epsilon=1.0, epsilon_decay=0.001, num_epis
 
     # -------------------------------------------------------------------------------
     # Initialize Q(s,a) for all s, a except that Q(terminal,.)=0 --------------------
-    # -------------------------------------------------------------------------------
+    # -----------------------------------------------------------------pp--------------
     n_states = env.observation_space.n
     n_actions = env.action_space.n
     Q = np.zeros((n_states, n_actions))
@@ -101,7 +102,7 @@ if __name__ == "__main__":
     
     env_name = 'CliffWalking-v0'
     env = gym.make(env_name, render_mode='rgb_array')
-    env.seed(0)
+    env.reset(seed = 0)
     
     alpha = 0.1
     gamma = 0.99
@@ -115,8 +116,10 @@ if __name__ == "__main__":
         gamma=gamma, 
         epsilon=epsilon,  
         epsilon_decay=epsilon_decay, 
-        num_episodes=num_episodes, 
+        num_episodes=num_episodes,
+        render=True 
     )
+    
     print(Q)
     
     Q = load_obj('cliffwalking_sarsa')

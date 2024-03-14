@@ -8,7 +8,6 @@ from common.env import Dyna_env
 from common import cli
 import time
 
-
 env = Dyna_env()
 
 # algorithm parameters
@@ -106,7 +105,7 @@ def dyna_q(args):
     action_memory = {}
     for i in range(episode_length):
         
-        state = env.reset() # player pos
+        state, _ = env.reset() # player pos
         
         done = False
         total_reward = 0

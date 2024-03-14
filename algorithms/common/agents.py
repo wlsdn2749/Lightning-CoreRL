@@ -52,12 +52,18 @@ class ValueAgent(Agent):
             action defined by policy
         """
         # Epsilon greedy
-        if np.random.random < self.epsilon:
+        if np.random.random() < self.epsilon:
             action = self.get_random_action()
         else: 
             action = self.get_action(state, device)    
             
         return action
+    
+    def get_random_action(self) -> int:
+        """returns a random action"""
+        action = randint(0, self.action_space - 1)
+
+        return action    
 
     def get_action(self, state: torch.Tensor, device: torch.device):
         """
@@ -71,7 +77,10 @@ class ValueAgent(Agent):
             
         q_values = self.net(state)
         
-        _, action = torch.max(q_values, dim=1)
+        # _, action = torch.max(q_values, dim=1)
+        # return int(action.item())
+        
+        _, action = torch.max(q_values, dim=0) # tuple(max, max_indices)
         return int(action.item())
     
     def update_epsilon(self, step: int) -> None:

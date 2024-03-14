@@ -18,12 +18,14 @@ class ToTensor(gym.Wrapper):
 
     def step(self, action):
         """Take 1 step and cast to tensor"""
-        state, reward, done, truncated, info = self.env.step(action)
-        return torch.tensor(state), torch.tensor(reward), done, info
+        state, reward, terminated, truncated, info = self.env.step(action)
+        
+        return torch.tensor(state), torch.tensor(reward), terminated, truncated, info # v0.26
 
     def reset(self):
         """reset the env and cast to tensor"""
-        return torch.tensor(self.env.reset())
+        observation, info = self.env.reset()
+        return torch.tensor(observation), info
 
 
 class FireResetEnv(gym.Wrapper):
@@ -41,10 +43,14 @@ class FireResetEnv(gym.Wrapper):
     def reset(self):
         """reset the env"""
         self.env.reset()
-        obs, _, done, _, _ = self.env.step(1)
+        
+        obs, reward, terminated, truncated, info = self.env.step(1)
+        done = terminated or truncated
         if done:
             self.env.reset()
-        obs, _, done, _, _ = self.env.step(2)
+            
+        obs, reward, terminated, truncated, info = self.env.step(2)
+        done = terminated or truncated
         if done:
             self.env.reset()
         return obs
@@ -75,7 +81,7 @@ class MaxAndSkipEnv(gym.Wrapper):
     def reset(self):
         """Clear past frame buffer and init. to first obs. from inner env."""
         self._obs_buffer.clear()
-        obs = self.env.reset()
+        obs, _ = self.env.reset()
         self._obs_buffer.append(obs)
         return obs
 
@@ -150,7 +156,9 @@ class BufferWrapper(gym.ObservationWrapper):
         """reset env"""
         self.buffer = np.zeros_like(
             self.observation_space.low, dtype=self.dtype)
-        return self.observation(self.env.reset())
+        
+        obs, info = self.env.reset()
+        return self.observation(obs)
 
     def observation(self, observation):
         """convert observation"""

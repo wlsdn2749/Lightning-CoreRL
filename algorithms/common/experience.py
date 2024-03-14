@@ -49,18 +49,21 @@ class ExperienceSource:
     def __init__(self, env: Env, agent: Agent, device):
         self.env = env
         self.agent = agent
-        self.state = self.env.reset()
+        self.state, _ = self.env.reset()
         self.device = device
     
     def _reset(self) -> None:
         """resets the env and state"""
-        self.state = self.env.reset()
+        self.state, _ = self.env.reset()
         
         
     def step(self) -> Tuple[Experience, float, bool]:
         """ Takes a single step through the environment"""
         action = self.agent(self.state, self.device)
-        new_state, reward, _, done, _, = self.env.step(action)
+        new_state, reward, terminated, truncated, info, = self.env.step(action)
+        
+        done = terminated or truncated
+        
         experience = Experience(state=self.state,
                                 action=action,
                                 reward=reward,
@@ -70,7 +73,7 @@ class ExperienceSource:
         self.state = new_state
         
         if done:
-            self.state = self.env.reset()
+            self.state, _ = self.env.reset()
             
         return experience, reward, done
     

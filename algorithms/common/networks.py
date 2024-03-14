@@ -62,4 +62,34 @@ class CNN(nn.Module):
         conv_out = self.conv(input_x).view(input_x.size()[0], -1)
         return self.head(conv_out)
     
+class MLP(nn.Module):
+    """
+    Simple MLP network
+
+    Args:
+        input_shape: observation shape of the environment
+        n_actions: number of discrete actions available in the environment
+        hidden_size: size of hidden layers
+    """
+
+    def __init__(self, input_shape: Tuple, n_actions: int, hidden_size: int = 128):
+        super(MLP, self).__init__()
+        self.net = nn.Sequential(
+            nn.Linear(input_shape[0], hidden_size),
+            nn.ReLU(),
+            nn.Linear(hidden_size, n_actions)
+        )
+
+    def forward(self, input_x):
+        """
+        Forward pass through network
+
+        Args:
+            x: input to network
+
+        Returns:
+            output of network
+        """
+        return self.net(input_x.float())
+
     
