@@ -7,3 +7,5 @@ __pycache__/
 # Experiments
 *.pkl
 wandb/
+
+basic_dqn

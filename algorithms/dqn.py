@@ -34,7 +34,7 @@ class DQNLightning(pl.LightningModule):
         # self.hparams = hparams 
         
         
-        device = torch.device("cuda:0" if self.hparams.devices > 0 else "cpu")
+        device = torch.device("cuda" if self.hparams.devices > 0 else "cpu")
         
         # self.env = wrappers.make_env(self.hparams.env)    # use for Atari
         self.env = ToTensor(gym.make(self.hparams.env))     # use for Box2D/Control
@@ -190,15 +190,17 @@ class DQNLightning(pl.LightningModule):
         """Evaluate the agent for 10 episodes"""
         self.agent.epsilon = 0.0 # Greedy Search
         test_reward = self.source.run_episode()
-        
-        return {'test_reward': test_reward}
+        metrics = {'test_reward': test_reward}
+        self.log_dict(metrics)
+        return metrics
     
-    def test_epoch_end(self, outputs) -> Dict[str, torch.Tensor]:
+    def on_test_epoch_end(self, outputs) -> Dict[str, torch.Tensor]:
         """Log the avg of the test results"""
         rewards = [ x['test_reward'] for x in outputs ]
         avg_reward = sum(rewards) / len(rewards)
-        logs = {'avg_test_reward': avg_reward}
-        return {'avg_test_reward': avg_reward, 'log': logs}
+        metrics = {'avg_test_reward': avg_reward}
+        self.log_dict(metrics)
+        return metrics
     
     def configure_optimizers(self) -> List[Optimizer]:
         """ Initialize Adam optimizer"""
