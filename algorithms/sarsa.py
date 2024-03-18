@@ -94,7 +94,7 @@ def sarsa(env, alpha=0.8, gamma=0.98, epsilon=1.0, epsilon_decay=0.001, num_epis
     #save Q function (q_table)
     if save_path:
         save_obj(Q, 'cliffwalking_sarsa')
-    
+
     return Q
 
 if __name__ == "__main__":

@@ -161,15 +161,23 @@ class DQNLightning(pl.LightningModule):
         if self.global_step % self.hparams.sync_rate == 0:
             self.target_net.load_state_dict(self.net.state_dict())
             
-        log = {'total_reward' : torch.tensor(self.total_reward).to(self.device),
-               'avg_reward': torch.tensor(self.avg_reward),
-               'train_loss': loss,
-               'episode_steps': torch.tensor(self.total_episode_steps)
-               }
+        # log = {'total_reward' : torch.tensor(self.total_reward).to(self.device),
+        #        'avg_reward': torch.tensor(self.avg_reward),
+        #        'train_loss': loss,
+        #        'episode_steps': torch.tensor(self.total_episode_steps)
+        #        }
         
-        status = {'steps': torch.tensor(self.global_step).to(self.device),
-                  'avg_reward': torch.tensor(self.avg_reward),
-                  'total_reward': torch.tensor(self.total_reward).to(self.device),
+        # status = {'steps': torch.tensor(self.global_step).to(self.device),
+        #           'avg_reward': torch.tensor(self.avg_reward),
+        #           'total_reward': torch.tensor(self.total_reward).to(self.device),
+        #           'episodes': self.episode_count,
+        #           'episode_steps': self.episode_steps,
+        #           'epsilon': self.agent.epsilon
+        #           }
+        
+        status = {'steps': self.global_step,
+                  'avg_reward': self.avg_reward,
+                  'total_reward': self.total_reward,
                   'episodes': self.episode_count,
                   'episode_steps': self.episode_steps,
                   'epsilon': self.agent.epsilon
