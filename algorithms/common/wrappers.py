@@ -7,9 +7,15 @@ import numpy as np
 import cv2
 import gymnasium as gym
 import gymnasium.spaces as gymspaces
+
 import torch
 
-
+class Monitor(gym.wrappers.RecordVideo):
+    def __init__(self, env: gym.Env, video_folder: str, step_trigger=None, name_prefix: str = 'rl-video', disable_logger = True):
+        if step_trigger is None:
+            step_trigger = lambda x: x % 2000 == 0
+        super().__init__(env, video_folder, episode_trigger=None, step_trigger=step_trigger, name_prefix=name_prefix, disable_logger = disable_logger)
+    
 class ToTensor(gym.Wrapper):
     """For environments where the user need to press FIRE for the game to start."""
 
@@ -22,9 +28,9 @@ class ToTensor(gym.Wrapper):
         
         return torch.tensor(state), torch.tensor(reward), terminated, truncated, info # v0.26
 
-    def reset(self):
+    def reset(self, seed=None, options=None):
         """reset the env and cast to tensor"""
-        observation, info = self.env.reset()
+        observation, info = self.env.reset(seed=seed, options=options)
         return torch.tensor(observation), info
 
 

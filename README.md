@@ -3,6 +3,8 @@ This repository is created for personal study and research purposes, containing 
 
 Most of these algorithms were based off the implementations found in [core_rl](https://github.com/djbyrne/core_rl)
 
+Use **Wandb Logger** and Gym Monitor is default used. If you login wandb, you can see video and log on wandb pages
+
 ## Algorithms
 
 ### Model-free
@@ -10,7 +12,7 @@ Most of these algorithms were based off the implementations found in [core_rl](h
 #### Off Policy
 - [x] Q-learning
 - [x] SARSA 
-- [ ] DQN
+- [x] DQN **(24-03-24)**
 - [ ] Double DQN
 - [ ] Dueling DQN
 - [ ] Noisy DQN
@@ -39,7 +41,7 @@ Most of these algorithms were based off the implementations found in [core_rl](h
 
 ## Installation
 ```bash
-poetry...
+poetry install
 ```
 
 ## Usage
@@ -47,8 +49,13 @@ Each algorithm is organized into separate directories, and you can refer to the 
 
 
 ## Quick Start
+
+Python 3.11 <br>
+Lightning 2.1.1
+
 ```bash
-python ...
+poetry shell 
+python dqn.py ...
 ```
 
 ## Contributions

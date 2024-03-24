@@ -19,7 +19,7 @@ from common.networks import CNN, MLP
 from common.agents import ValueAgent
 from common.experience import ExperienceSource, RLDataset
 from common.memory import ReplayBuffer
-from common.wrappers import ToTensor
+from common.wrappers import ToTensor, Monitor
 
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
@@ -37,7 +37,9 @@ class DQNLightning(pl.LightningModule):
         device = torch.device("cuda" if self.hparams.devices > 0 else "cpu")
         
         # self.env = wrappers.make_env(self.hparams.env)    # use for Atari
-        self.env = ToTensor(gym.make(self.hparams.env))     # use for Box2D/Control
+        self.env = ToTensor(gym.make(id=self.hparams.env, 
+                                     render_mode=self.hparams.render_mode))     # use for Box2D/Control
+        self.env = Monitor(self.env, video_folder='video', disable_logger=True) # Logging
         self.env.reset()
         
         self.obs_shape = self.env.observation_space.shape
@@ -161,20 +163,6 @@ class DQNLightning(pl.LightningModule):
         if self.global_step % self.hparams.sync_rate == 0:
             self.target_net.load_state_dict(self.net.state_dict())
             
-        # log = {'total_reward' : torch.tensor(self.total_reward).to(self.device),
-        #        'avg_reward': torch.tensor(self.avg_reward),
-        #        'train_loss': loss,
-        #        'episode_steps': torch.tensor(self.total_episode_steps)
-        #        }
-        
-        # status = {'steps': torch.tensor(self.global_step).to(self.device),
-        #           'avg_reward': torch.tensor(self.avg_reward),
-        #           'total_reward': torch.tensor(self.total_reward).to(self.device),
-        #           'episodes': self.episode_count,
-        #           'episode_steps': self.episode_steps,
-        #           'epsilon': self.agent.epsilon
-        #           }
-        
         status = {'steps': self.global_step,
                   'avg_reward': self.avg_reward,
                   'total_reward': self.total_reward,
@@ -183,30 +171,15 @@ class DQNLightning(pl.LightningModule):
                   'epsilon': self.agent.epsilon
                   }
         
-        # self.log_dict(log, prog_bar=True)
         self.log_dict(status, prog_bar=True)
-        
-        # return OrderedDict({'loss': loss,
-        #                     'avg_reward': torch.tensor(self.avg_reward),
-        #                     'log': log,
-        #                     'progress_bar': status})
-        
+
         return loss
 
-        
     def test_step(self, *args, **kwargs) -> Dict[str, torch.Tensor]:
         """Evaluate the agent for 10 episodes"""
         self.agent.epsilon = 0.0 # Greedy Search
         test_reward = self.source.run_episode()
         metrics = {'test_reward': test_reward}
-        self.log_dict(metrics)
-        return metrics
-    
-    def on_test_epoch_end(self, outputs) -> Dict[str, torch.Tensor]:
-        """Log the avg of the test results"""
-        rewards = [ x['test_reward'] for x in outputs ]
-        avg_reward = sum(rewards) / len(rewards)
-        metrics = {'avg_test_reward': avg_reward}
         self.log_dict(metrics)
         return metrics
     
@@ -263,7 +236,8 @@ class DQNLightning(pl.LightningModule):
 if __name__ == "__main__":
 
     wandb.init(
-        project='basic_dqn'
+        project='basic_dqn',
+        monitor_gym=True
     )
     
     wandb_logger = WandbLogger(

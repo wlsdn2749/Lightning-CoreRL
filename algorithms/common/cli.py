@@ -20,6 +20,7 @@ def add_base_args(parent) -> argparse.ArgumentParser:
     arg_parser.add_argument("--lr", type=float, default=1e-4, help="learning rate")
     arg_parser.add_argument("--alpha", type=float, default=0.1, help="alpha")
     arg_parser.add_argument("--env", type=str, default="CartPole-v1", help="gym environment tag")
+    arg_parser.add_argument("--render_mode", type=str, default="rgb_array", help="gym render_mode | human, rgb_array, ansl, None")
     arg_parser.add_argument("--gamma", type=float, default=0.99, help="discount factor")
     arg_parser.add_argument("--episode_length", type=int, default=500, help="max length of an episode")
     # arg_parser.add_argument("--max_episode_reward", type=int, default=18,
